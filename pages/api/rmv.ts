@@ -1,18 +1,20 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { spawn } from "child_process";
+import { IncomingForm } from "formidable";
 import { promises as fs } from "fs";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { v4 as uuidv4 } from "uuid";
 const sharp = require("sharp");
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 type Data = {
   message: string;
   data?: string;
-};
-
-const spawnOpts = {
-  env: process.env,
-  stdio: "inherit",
 };
 
 export default async function handler(
@@ -21,13 +23,20 @@ export default async function handler(
 ) {
   const id = uuidv4();
 
-  const model = req.body.model ?? "u2net";
-
-  //console.log("process.env.PATH :>> ", process.env.PATH);
+  const data: any = await new Promise((resolve, reject) => {
+    const form = new IncomingForm();
+    form.parse(req, (err, fields, files) => {
+      if (err) return reject(err);
+      resolve({ fields, files });
+    });
+  });
 
   const removeBg = (readPath: string, writePath: string) => {
     return new Promise((resolve, reject) => {
-      const remove = spawn("rembg", ["i", "-m", model, readPath, writePath]);
+      const remove = spawn(
+        "/Users/burak/Library/Python/3.7/bin/backgroundremover",
+        ["-i", readPath, "-wn", "5", "-o", writePath]
+      );
 
       remove.on("error", (error) => {
         console.log(`error: ${error.message}`);
@@ -42,10 +51,11 @@ export default async function handler(
   };
 
   try {
-    const imageStr = req.body.str;
+    const imageFile = data.files.image; // .image because I named it in client side by that name: // pictureData.append('image', pictureFile);
+    const imagePath = imageFile.filepath;
     const tempImage = `temp/${id}.png`; // include name and .extention, you can get the name from data.files.image object
     const tempImageRemoved = `temp/${id}_removed.png`; // include name and .extention, you can get the name from data.files.image object
-    await sharp(Buffer.from(imageStr, "base64"))
+    await sharp(imagePath)
       .resize({
         width: 380,
         height: 380,
@@ -55,8 +65,8 @@ export default async function handler(
       })
       .toFile(tempImage);
     const cwd = process.cwd();
-    const readPath = tempImage;
-    const writePath = tempImageRemoved;
+    const readPath = cwd + "/" + tempImage;
+    const writePath = cwd + "/" + tempImageRemoved;
     console.log("cwd :>> ", cwd);
 
     try {
