@@ -10,11 +10,6 @@ type Data = {
   data?: string;
 };
 
-const spawnOpts = {
-  env: process.env,
-  stdio: "inherit",
-};
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -43,8 +38,8 @@ export default async function handler(
 
   try {
     const imageStr = req.body.str;
-    const tempImage = `temp/${id}.png`; // include name and .extention, you can get the name from data.files.image object
-    const tempImageRemoved = `temp/${id}_removed.png`; // include name and .extention, you can get the name from data.files.image object
+    const tempImage = `public/${id}.png`; // include name and .extention, you can get the name from data.files.image object
+    const tempImageRemoved = `public/${id}_removed.png`; // include name and .extention, you can get the name from data.files.image object
     await sharp(Buffer.from(imageStr, "base64"))
       .resize({
         width: 380,
