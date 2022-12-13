@@ -73,8 +73,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    setTimeout(() => toast.error("Error"), 3000);
-
     return () => clearInterval(timerInterval.current as NodeJS.Timeout);
   }, []);
 
