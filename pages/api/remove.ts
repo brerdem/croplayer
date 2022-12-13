@@ -10,6 +10,14 @@ type Data = {
   data?: string;
 };
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb", // Set desired value here
+    },
+  },
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
