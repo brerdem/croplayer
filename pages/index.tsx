@@ -59,9 +59,7 @@ export default function Home() {
       setRemoved(res.data.data);
     } catch (error: any) {
       console.log("error :>> ", error);
-      toast.error(
-        error.response.message ? error.response.message : error.message
-      );
+      toast.error(error.response.data ? error.response.data : error.message);
     }
     setLoading(false);
     clearInterval(timerInterval.current as NodeJS.Timeout);
