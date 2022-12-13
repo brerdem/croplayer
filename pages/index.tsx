@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Lottie from "lottie-react";
 import loadingAnimation from "../public/loading.json";
+import { toast } from "react-toastify";
 
 export default function Home() {
   const fileTypes = ["JPG", "PNG"];
@@ -56,8 +57,9 @@ export default function Home() {
         },
       });
       setRemoved(res.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.log("error :>> ", error);
+      toast.error(error.message ?? error);
     }
     setLoading(false);
     clearInterval(timerInterval.current as NodeJS.Timeout);
@@ -71,6 +73,8 @@ export default function Home() {
   };
 
   useEffect(() => {
+    setTimeout(() => toast.error("Error"), 3000);
+
     return () => clearInterval(timerInterval.current as NodeJS.Timeout);
   }, []);
 
